@@ -4,6 +4,8 @@ import haxe.Log;
 
 import Date;
 
+import funkin.util.AnsiUtil;
+
 using StringTools;
 
 class ModuleTemplate extends Module {
@@ -38,7 +40,32 @@ class ModuleTemplate extends Module {
                 type = "error";
             }
 
-            var out = "[  " + timeString + "  | " + getTypeAsString(type) + " ] " + realFileName + ":" + v2.lineNumber + ": " + v1;
+            if (Std.string(v1).indexOf("WARNING:") != -1 || Std.string(v1).indexOf("WARNING") != -1) {
+                v1 = v1.replace("WARNING: ", "");
+                v1 = v1.replace("WARNING", "");
+                var it = v1.split("");
+                for (i in 0...16)
+                    it.shift();
+                v1 = it.join("");
+                type = "warning";
+            } else if (Std.string(v1).indexOf("DISCORD") != -1) {
+                v1 = v1.replace("DISCORD", "");
+                var it = v1.split("");
+                for (i in 0...16)
+                    it.shift();
+                v1 = it.join("");
+                type = "discord";
+            } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
+                v1 = v1.replace(" ERROR  ", "");
+                type = "error";
+            }
+
+            while (v1.startsWith(" ")) {
+                var split = Std.string(v1).split("");
+                split.shift();
+                v1 = split.join("");
+            }
+            var out = "[  " + AnsiUtil.magenta(timeString) + "  | " + getTypeAsString(type) + " ] " + AnsiUtil.bright_green(realFileName + ":" + v2.lineNumber + ": ") + v1;
             
             oldTrace(out);
         }
@@ -47,13 +74,13 @@ class ModuleTemplate extends Module {
     public function getTypeAsString(type) {
         switch (type) {
             case "log":
-                return " INFORMATION ";
+                return AnsiUtil.cyan(" INFORMATION ");
             case "error":
-                return "    ERROR    ";
+                return AnsiUtil.red("    ERROR    ");
             case "warning":
-                return "   WARNING   ";
+                return AnsiUtil.yellow("   WARNING   ");
             case "discord":
-                return "   DISCORD   ";
+                return AnsiUtil.blue("   DISCORD   ");
         }
     }
 
