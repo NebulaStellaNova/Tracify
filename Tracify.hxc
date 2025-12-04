@@ -10,64 +10,74 @@ using StringTools;
 
 class ModuleTemplate extends Module {
     var oldTrace;
+    
+    var traceCallback = function(v1, ?v2) {
+        // oldTrace(v2.fileName.split('/')[1]);
+        // if (v2.fileName.indexOf("funkin") != -1) return;
+        // if (v2.fileName.indexOf("polymod") != -1) return;
+
+        var time = Date.now();
+        var timeString = addZeros(Std.string(time.getHours())) + ":" + addZeros(Std.string(time.getMinutes())) + ":" + addZeros(Std.string(time.getSeconds()));
+
+        var realFileName = v2.fileName.split('/').pop();
+        var thing = realFileName.split("");
+        if (thing[thing.length-1] == ")") thing.pop();
+        realFileName = thing.join("");
+
+        var type = "log";
+        if (Std.string(v1).indexOf(" WARNING  ") != -1 || Std.string(v1).indexOf("WARNING: ") != -1) {
+            v1 = v1.replace(" WARNING  ", "");
+            v1 = v1.replace("WARNING: ", "");
+            type = "warning";
+        } else if (Std.string(v1).indexOf(" DISCORD  ") != -1) {
+            v1 = v1.replace(" DISCORD  ", "");
+            type = "discord";
+        } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
+            v1 = v1.replace(" ERROR  ", "");
+            type = "error";
+        }
+
+        if (Std.string(v1).indexOf("WARNING:") != -1 || Std.string(v1).indexOf("WARNING") != -1) {
+            v1 = v1.replace("WARNING: ", "");
+            v1 = v1.replace("WARNING", "");
+            var it = v1.split("");
+            for (i in 0...16)
+                it.shift();
+            v1 = it.join("");
+            type = "warning";
+        } else if (Std.string(v1).indexOf("DISCORD") != -1) {
+            v1 = v1.replace("DISCORD", "");
+            var it = v1.split("");
+            for (i in 0...16)
+                it.shift();
+            v1 = it.join("");
+            type = "discord";
+        } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
+            v1 = v1.replace(" ERROR  ", "");
+            type = "error";
+        }
+
+        while (v1.startsWith(" ")) {
+            var split = Std.string(v1).split("");
+            split.shift();
+            v1 = split.join("");
+        }
+        var out = "[  " + AnsiUtil.magenta(timeString) + "  | " + getTypeAsString(type) + " ] " + AnsiUtil.bright_green(realFileName + ":" + v2.lineNumber + ": ") + v1;
+        
+        oldTrace(out);
+    }
+    
     public function new() {
         super('ModuleTemplate');
         // var thin = "\x1b[0m";
         oldTrace = Log.trace;
-        Log.trace = function(v1, ?v2) {
-            // oldTrace(v2.fileName.split('/')[1]);
-            // if (v2.fileName.indexOf("funkin") != -1) return;
-            // if (v2.fileName.indexOf("polymod") != -1) return;
+        Log.trace = traceCallback;
+    }
 
-            var time = Date.now();
-            var timeString = addZeros(Std.string(time.getHours())) + ":" + addZeros(Std.string(time.getMinutes())) + ":" + addZeros(Std.string(time.getSeconds()));
-
-            var realFileName = v2.fileName.split('/').pop();
-            var thing = realFileName.split("");
-            if (thing[thing.length-1] == ")") thing.pop();
-            realFileName = thing.join("");
-
-            var type = "log";
-            if (Std.string(v1).indexOf(" WARNING  ") != -1 || Std.string(v1).indexOf("WARNING: ") != -1) {
-                v1 = v1.replace(" WARNING  ", "");
-                v1 = v1.replace("WARNING: ", "");
-                type = "warning";
-            } else if (Std.string(v1).indexOf(" DISCORD  ") != -1) {
-                v1 = v1.replace(" DISCORD  ", "");
-                type = "discord";
-            } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
-                v1 = v1.replace(" ERROR  ", "");
-                type = "error";
-            }
-
-            if (Std.string(v1).indexOf("WARNING:") != -1 || Std.string(v1).indexOf("WARNING") != -1) {
-                v1 = v1.replace("WARNING: ", "");
-                v1 = v1.replace("WARNING", "");
-                var it = v1.split("");
-                for (i in 0...16)
-                    it.shift();
-                v1 = it.join("");
-                type = "warning";
-            } else if (Std.string(v1).indexOf("DISCORD") != -1) {
-                v1 = v1.replace("DISCORD", "");
-                var it = v1.split("");
-                for (i in 0...16)
-                    it.shift();
-                v1 = it.join("");
-                type = "discord";
-            } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
-                v1 = v1.replace(" ERROR  ", "");
-                type = "error";
-            }
-
-            while (v1.startsWith(" ")) {
-                var split = Std.string(v1).split("");
-                split.shift();
-                v1 = split.join("");
-            }
-            var out = "[  " + AnsiUtil.magenta(timeString) + "  | " + getTypeAsString(type) + " ] " + AnsiUtil.bright_green(realFileName + ":" + v2.lineNumber + ": ") + v1;
-            
-            oldTrace(out);
+    public function onUpdate(e) {
+        super.onUpdate(e);
+        if (Log.trace != traceCallback) {
+            Log.trace = traceCallback;
         }
     }
 
