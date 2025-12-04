@@ -47,7 +47,7 @@ class ModuleTemplate extends Module {
     public function getTypeAsString(type) {
         switch (type) {
             case "log":
-                return "    TRACE    ";
+                return " INFORMATION ";
             case "error":
                 return "    ERROR    ";
             case "warning":
