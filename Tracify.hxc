@@ -37,6 +37,7 @@ class ModuleTemplate extends Module {
             type = "error";
         }
 
+
         if (Std.string(v1).indexOf("WARNING:") != -1 || Std.string(v1).indexOf("WARNING") != -1) {
             v1 = v1.replace("WARNING: ", "");
             v1 = v1.replace("WARNING", "");
@@ -52,8 +53,12 @@ class ModuleTemplate extends Module {
                 it.shift();
             v1 = it.join("");
             type = "discord";
-        } else if (Std.string(v1).indexOf(" ERROR  ") != -1) {
-            v1 = v1.replace(" ERROR  ", "");
+        } else if (Std.string(v1).indexOf("ERROR") != -1) {
+            v1 = v1.replace("ERROR", "");
+            var it = v1.split("");
+            for (i in 0...16)
+                it.shift();
+            v1 = it.join("");
             type = "error";
         }
 
@@ -62,9 +67,13 @@ class ModuleTemplate extends Module {
             split.shift();
             v1 = split.join("");
         }
+        if (type == 'error') v1 = AnsiUtil.red(v1);
+
         var out = "[  " + AnsiUtil.magenta(timeString) + "  | " + getTypeAsString(type) + " ] " + AnsiUtil.bright_green(realFileName + ":" + v2.lineNumber + ": ") + v1;
         
         oldTrace(out);
+
+        // a
     }
     
     public function new() {
