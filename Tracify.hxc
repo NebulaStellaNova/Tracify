@@ -6,6 +6,7 @@ import Date;
 
 import funkin.util.AnsiUtil;
 
+import StringTools;
 using StringTools;
 
 class ModuleTemplate extends Module {
@@ -60,6 +61,15 @@ class ModuleTemplate extends Module {
                 it.shift();
             v1 = it.join("");
             type = "error";
+        } else if (Std.string(v1).indexOf("NEWGROUNDS") != -1) {
+            v1 = v1.replace("NEWGROUNDS", "");
+            var it = v1.split("");
+            var color = v1.substr(0, 16);
+            for (i in 0...16)
+                it.shift();
+            v1 = it.join("");
+            // v1 =  + it;
+            type = "newgrounds";
         }
 
         while (v1.startsWith(" ")) {
@@ -98,6 +108,8 @@ class ModuleTemplate extends Module {
                 return AnsiUtil.red("    ERROR    ");
             case "warning":
                 return AnsiUtil.yellow("   WARNING   ");
+            case "newgrounds":
+                return AnsiUtil.bright_yellow("  NEWGROUND  ");
             case "discord":
                 return AnsiUtil.blue("   DISCORD   ");
         }
