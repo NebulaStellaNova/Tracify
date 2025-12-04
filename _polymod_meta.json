@@ -1,7 +1,7 @@
 {
   "music": "freeplayRandom",
   "title": "Tracify",
-  "description": "Bring CNE traces to V-Slice (Without color cuz booo hscript)",
+  "description": "Bring CNE traces to V-Slice",
   "contributors": [
       {
         "name": "Nebula S. Nova",
